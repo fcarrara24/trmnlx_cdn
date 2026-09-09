@@ -1,0 +1,8 @@
+{
+  "id": "default",
+  "type": "markdown",
+  "source": "content.md",
+  "start": "2000-01-01T00:00:00+00:00",
+  "priority": 0,
+  "enabled": true
+}

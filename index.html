@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=800, initial-scale=1" />
+    <title>TRMNL Generic Display</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main id="content" class="content" aria-live="polite">
+      <p class="viewer-boot">Caricamento…</p>
+    </main>
+
+    <!-- Barra di stato: nascosta di default, visibile con ?debug=1 -->
+    <footer id="status" class="status" hidden></footer>
+
+    <script type="module">
+      if (new URLSearchParams(location.search).has('debug')) {
+        document.querySelector('#status').hidden = false;
+      }
+    </script>
+    <script type="module" src="./src/viewer.js"></script>
+  </body>
+</html>

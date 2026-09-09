@@ -1,0 +1,15 @@
+{
+  "name": "trmnl-generic-display",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema Git-backed per programmare e visualizzare contenuti su un display TRMNL tramite GitHub Pages",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-schedule.js",
+    "test": "node --test \"test/**/*.test.js\"",
+    "serve": "node scripts/serve.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
