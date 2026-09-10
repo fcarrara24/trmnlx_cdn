@@ -5,11 +5,24 @@ import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
-const CONTENT_ROOT = 'content';
 const OUTPUT = 'public/trmnl.json';
 
 async function readJson(file) {
   return JSON.parse(await readFile(file, 'utf8'));
+}
+
+function sourcePathFromSchedule(source) {
+  return source.replace(/^\/+/, '');
+}
+
+function toEpoch(value) {
+  const timestamp = new Date(value).getTime();
+
+  if (Number.isNaN(timestamp)) {
+    throw new Error(`Data non valida: "${value}"`);
+  }
+
+  return Math.floor(timestamp / 1000);
 }
 
 async function renderMermaid(sourcePath, outputPath) {
@@ -27,21 +40,18 @@ async function renderMermaid(sourcePath, outputPath) {
   ]);
 }
 
-function toEpoch(value) {
-  return Math.floor(new Date(value).getTime() / 1000);
-}
-
 async function build() {
   const schedule = await readJson('public/schedule.json');
 
   const items = [];
+  const tempDir = path.join('.tmp', 'trmnl');
 
-  for (const item of schedule.items) {
-    const sourcePath = path.join(
-      CONTENT_ROOT,
-      item.id,
-      path.basename(item.source),
-    );
+  await mkdir(tempDir, { recursive: true });
+
+  for (const item of schedule.items ?? []) {
+    if (item.enabled === false) {
+      continue;
+    }
 
     if (item.type !== 'mermaid') {
       throw new Error(
@@ -49,10 +59,10 @@ async function build() {
       );
     }
 
-    const tempDir = path.join('.tmp', 'trmnl');
+    const sourcePath = sourcePathFromSchedule(item.source);
     const svgPath = path.join(tempDir, `${item.id}.svg`);
 
-    await mkdir(tempDir, { recursive: true });
+    console.log(`TRMNL: rendering ${sourcePath}`);
 
     await renderMermaid(sourcePath, svgPath);
 
@@ -64,10 +74,17 @@ async function build() {
       start: toEpoch(item.start),
       end: item.end == null ? null : toEpoch(item.end),
       priority: item.priority ?? 0,
-      enabled: item.enabled !== false,
-      content: svg,
+      enabled: true,
+      content: svg.trim(),
     });
   }
+
+  // Stessa priorità di selezione di src/utils/schedule.js:
+  // start DESC, poi priority DESC.
+  items.sort((a, b) => (
+    b.start - a.start ||
+    b.priority - a.priority
+  ));
 
   const output = {
     generatedAt: new Date().toISOString(),

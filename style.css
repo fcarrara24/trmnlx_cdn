@@ -178,6 +178,27 @@ body {
   max-width: 100%;
 }
 
+/* --- displayer: markdown --- */
+
+.displayer-loading,
+.displayer-empty,
+.displayer-error {
+  width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.displayer-error h1 {
+  font-size: 26px;
+  margin: 0 0 12px;
+}
+
+.displayer-error p {
+  margin: 0;
+}
+
 /* --- renderer: mermaid --- */
 
 .render-mermaid {
