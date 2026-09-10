@@ -4,5 +4,5 @@
   "source": "diagram.mmd",
   "start": "2026-09-09T00:00:00+02:00",
   "priority": 5,
-  "enabled": false
+  "enabled": true
 }

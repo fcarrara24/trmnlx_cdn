@@ -39,13 +39,25 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Assemble site
+        run: |
+          rm -rf _site
+          mkdir -p _site
+
+          cp index.html _site/
+          cp style.css _site/
+          cp public/schedule.json _site/
+
+          cp -r src _site/
+          cp -r content _site/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: ./_site
 
   deploy:
     environment:

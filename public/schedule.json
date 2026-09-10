@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-09T05:33:36.512Z",
+  "generatedAt": "2026-09-10T05:10:33.727Z",
   "items": [
     {
       "id": "morning-report",
@@ -8,6 +8,13 @@
       "start": "2026-09-10T08:00:00+02:00",
       "priority": 10,
       "end": "2026-09-10T12:00:00+02:00"
+    },
+    {
+      "id": "architecture",
+      "type": "mermaid",
+      "source": "/content/architecture/diagram.mmd",
+      "start": "2026-09-09T00:00:00+02:00",
+      "priority": 5
     },
     {
       "id": "default",
