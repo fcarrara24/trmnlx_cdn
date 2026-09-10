@@ -5,11 +5,15 @@
   "description": "Sistema Git-backed per programmare e visualizzare contenuti su un display TRMNL tramite GitHub Pages",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-schedule.js",
+    "build": "node scripts/build-schedule.js && node scripts/build-trmnl.js",
+    "build:trmnl": "node scripts/build-trmnl.js",
     "test": "node --test \"test/**/*.test.js\"",
     "serve": "node scripts/serve.js"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@mermaid-js/mermaid-cli": "^11.12.0"
   }
 }
