@@ -27,6 +27,18 @@ function toEpoch(value) {
 }
 
 async function renderMermaid(sourcePath, outputPath) {
+  const puppeteerConfig = path.join('.tmp', 'puppeteer-config.json');
+
+  await mkdir(path.dirname(puppeteerConfig), { recursive: true });
+
+  await writeFile(
+    puppeteerConfig,
+    JSON.stringify({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    }),
+    'utf8',
+  );
+
   await execFileAsync('npx', [
     '--no-install',
     'mmdc',
@@ -38,6 +50,8 @@ async function renderMermaid(sourcePath, outputPath) {
     'neutral',
     '-b',
     'white',
+    '--puppeteerConfigFile',
+    puppeteerConfig,
   ]);
 }
 
