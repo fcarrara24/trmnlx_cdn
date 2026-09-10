@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { marked } from 'marked';
 
 const execFileAsync = promisify(execFile);
 
@@ -40,33 +41,56 @@ async function renderMermaid(sourcePath, outputPath) {
   ]);
 }
 
+async function renderMarkdown(sourcePath) {
+  const markdown = await readFile(sourcePath, 'utf8');
+
+  const html = marked.parse(markdown, {
+    gfm: true,
+    breaks: false,
+  });
+
+  return `<article class="render-markdown">${html}</article>`;
+}
+
+async function renderItem(item) {
+  const sourcePath = sourcePathFromSchedule(item.source);
+
+  switch (item.type) {
+    case 'mermaid': {
+      const tempDir = path.join('.tmp', 'trmnl');
+      const svgPath = path.join(tempDir, `${item.id}.svg`);
+
+      await mkdir(tempDir, { recursive: true });
+
+      console.log(`  Rendering Mermaid: ${sourcePath}`);
+
+      await renderMermaid(sourcePath, svgPath);
+
+      return (await readFile(svgPath, 'utf8')).trim();
+    }
+
+    case 'markdown':
+      console.log(`  Rendering Markdown: ${sourcePath}`);
+      return renderMarkdown(sourcePath);
+
+    default:
+      throw new Error(
+        `TRMNL build: renderer non ancora supportato: "${item.type}"`,
+      );
+  }
+}
+
 async function build() {
   const schedule = await readJson('public/schedule.json');
 
   const items = [];
-  const tempDir = path.join('.tmp', 'trmnl');
-
-  await mkdir(tempDir, { recursive: true });
 
   for (const item of schedule.items ?? []) {
     if (item.enabled === false) {
       continue;
     }
 
-    if (item.type !== 'mermaid') {
-      throw new Error(
-        `TRMNL build: renderer non ancora supportato: "${item.type}"`,
-      );
-    }
-
-    const sourcePath = sourcePathFromSchedule(item.source);
-    const svgPath = path.join(tempDir, `${item.id}.svg`);
-
-    console.log(`TRMNL: rendering ${sourcePath}`);
-
-    await renderMermaid(sourcePath, svgPath);
-
-    const svg = await readFile(svgPath, 'utf8');
+    const content = await renderItem(item);
 
     items.push({
       id: item.id,
@@ -75,11 +99,11 @@ async function build() {
       end: item.end == null ? null : toEpoch(item.end),
       priority: item.priority ?? 0,
       enabled: true,
-      content: svg.trim(),
+      content,
     });
   }
 
-  // Stessa priorità di selezione di src/utils/schedule.js:
+  // Stessa regola di src/utils/schedule.js:
   // start DESC, poi priority DESC.
   items.sort((a, b) => (
     b.start - a.start ||
@@ -99,7 +123,7 @@ async function build() {
     'utf8',
   );
 
-  console.log(`TRMNL: scritto ${OUTPUT}`);
+  console.log(`Scritto ${OUTPUT} con ${items.length} item.`);
 }
 
 build().catch((error) => {

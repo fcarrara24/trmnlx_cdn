@@ -11,6 +11,7 @@ on:
       - 'index.html'
       - 'style.css'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
@@ -35,6 +36,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Puppeteer browser
+        run: npx puppeteer browsers install chrome-headless-shell
 
       - name: Build
         run: npm run build
@@ -47,6 +55,7 @@ jobs:
           cp index.html _site/
           cp style.css _site/
           cp public/schedule.json _site/
+          cp public/trmnl.json _site/
 
           cp -r src _site/
           cp -r content _site/

@@ -14,6 +14,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@mermaid-js/mermaid-cli": "^11.12.0"
+    "@mermaid-js/mermaid-cli": "^11.12.0",
+    "marked": "^12.0.2"
   }
 }
