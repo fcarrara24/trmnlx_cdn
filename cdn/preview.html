@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>Preview</title>
+    <link rel="stylesheet" href="../style.css" />
+    <style>
+      html, body { margin: 0; background: #fff; }
+      #content { width: 800px; height: 480px; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <div id="content">In attesa di contenuto…</div>
+    <script type="module">
+      const container = document.querySelector('#content');
+      let lastUrl = null;
+
+      window.addEventListener('message', async (event) => {
+        const { item, text } = event.data || {};
+        if (!item) return;
+
+        if (lastUrl) {
+          URL.revokeObjectURL(lastUrl);
+          lastUrl = null;
+        }
+
+        try {
+        const mod = await import(`/src/renderers/${item.type}.js`);
+          const blob = item.isBinary
+            ? await (await fetch(text)).blob()
+            : new Blob([text ?? ''], { type: 'text/plain' });
+          const sourceUrl = item.isBinary ? text : URL.createObjectURL(blob);
+          if (!item.isBinary) lastUrl = sourceUrl;
+          container.replaceChildren();
+          await mod.render({ item, sourceUrl, container });
+        } catch (error) {
+          container.textContent = `Errore preview: ${error.message}`;
+        }
+      });
+
+      window.parent.postMessage('preview-ready', '*');
+    </script>
+  </body>
+</html>

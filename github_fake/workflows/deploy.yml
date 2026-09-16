@@ -1,0 +1,75 @@
+name: Deploy TRMNL display
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installa le dipendenze
+        run: npm ci
+
+      - name: Valida i contenuti e genera schedule.json + trmnl.json
+        run: npm run build
+
+      - name: Esegui i test
+        run: npm test
+
+      - name: Assembla il sito
+        run: |
+          set -e
+          rm -rf _site
+          mkdir -p _site
+
+          # Viewer statico e asset condivisi.
+          cp index.html style.css _site/
+          cp -r src _site/src
+          cp -r cdn _site/cdn
+
+          # Content package grezzi: il viewer scarica i source direttamente
+          # da qui a runtime (markdown/mermaid/immagini).
+          cp -r content _site/content
+
+          # Output della build, serviti dalla root come su dev (scripts/serve.js).
+          cp public/schedule.json _site/schedule.json
+          cp public/trmnl.json _site/trmnl.json
+
+      - name: Configura Pages
+        uses: actions/configure-pages@v5
+
+      - name: Carica l'artifact di Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Pubblica su GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

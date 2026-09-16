@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TRMNL CDN — Editor contenuti</title>
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+  </head>
+  <body data-authed="false">
+    <!-- Overlay di autenticazione -->
+    <div id="auth-overlay" class="auth-overlay" hidden>
+      <div class="auth-card">
+        <h1>TRMNL CDN</h1>
+        <p>Accedi per pushare contenuti sul display.</p>
+        <label for="token-input" class="sr-only">GitHub personal access token</label>
+        <input id="token-input" type="password" autocomplete="off" placeholder="ghp_..." />
+        <button id="auth-btn" class="btn btn-primary">Accedi</button>
+        <p id="auth-error" class="auth-error" hidden></p>
+        <p class="auth-hint">
+          Usare un <em>Personal Access Token</em> con scope <code>repo</code> (o <code>public:repo</code> per repository pubbliche).
+          Il token non viene mai salvato lato server: vive solo in questo browser.
+        </p>
+      </div>
+    </div>
+
+    <!-- Interfaccia editor -->
+    <div id="app" class="app" hidden>
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">TRMNL</span>
+          <span class="brand-sub">CDN</span>
+        </div>
+        <div class="topbar-actions">
+          <span id="user-pill" class="user-pill" hidden></span>
+          <button id="logout-btn" class="btn btn-ghost" title="Disconnetti">Esci</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <!-- Sinistra: editor -->
+        <section class="pane editor-pane">
+          <div class="pane-head">
+            <h2>Contenuto</h2>
+            <div class="pane-head-actions">
+              <select id="content-select" class="select"></select>
+              <button id="new-btn" class="btn btn-ghost" title="Nuovo contenuto">+ Nuovo</button>
+              <button id="delete-btn" class="btn btn-danger" title="Elimina contenuto" disabled>Elimina</button>
+            </div>
+          </div>
+
+          <div class="editor-fields">
+            <label class="field">
+              <span class="field-label">ID (directory)</span>
+              <input id="id-input" type="text" class="input" autocomplete="off" spellcheck="false" />
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">Tipo</span>
+                <select id="type-select" class="select"></select>
+              </label>
+              <label class="field">
+                <span class="field-label">File sorgente</span>
+                <input id="source-input" type="text" class="input" autocomplete="off" />
+              </label>
+            </div>
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">Inizio</span>
+                <input id="start-input" type="text" class="input" autocomplete="off" placeholder="2026-09-10T08:00:00+02:00" />
+              </label>
+              <label class="field">
+                <span class="field-label">Fine (opzionale)</span>
+                <input id="end-input" type="text" class="input" autocomplete="off" placeholder="vuoto = sempre attivo" />
+              </label>
+            </div>
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">Priorità</span>
+                <input id="priority-input" type="number" class="input" value="0" />
+              </label>
+              <label class="field checkbox">
+                <input id="enabled-input" type="checkbox" checked />
+                <span>Abilitato</span>
+              </label>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Titolo (opzionale)</span>
+            <input id="title-input" type="text" class="input" autocomplete="off" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Contenuto (Markdown / Mermaid / testo)</span>
+            <textarea id="content-textarea" class="textarea" spellcheck="false" placeholder="# Titolo&#10;..."></textarea>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Opzioni (JSON opzionale, es. {"fontSize":"16px"})</span>
+            <textarea id="options-textarea" class="textarea textarea-small" spellcheck="false" placeholder="{ }"></textarea>
+          </label>
+
+          <div class="editor-actions">
+            <button id="push-btn" class="btn btn-primary" disabled>Push sul display</button>
+            <span id="push-status" class="push-status"></span>
+          </div>
+        </section>
+
+        <!-- Destra: preview -->
+        <section class="pane preview-pane">
+          <div class="pane-head">
+            <h2>Anteprima</h2>
+            <span class="preview-mode" id="preview-mode">Caricamento…</span>
+          </div>
+          <iframe id="preview-frame" class="preview-frame" title="Anteprima display"></iframe>
+        </section>
+      </main>
+
+      <footer class="status-bar">
+        <span id="status-text">Pronto.</span>
+      </footer>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" hidden></div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
