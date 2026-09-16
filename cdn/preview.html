@@ -25,7 +25,17 @@
         }
 
         try {
-        const mod = await import(`/src/renderers/${item.type}.js`);
+          if (window.location.hostname !== 'localhost') {
+            const response = await fetch('https://fcarrara24.github.io/trmnlx_cdn/trmnl.json');
+            const data = await response.json();
+            const itemData = data.items.find(i => i.id === item.id);
+            if (itemData) {
+              container.innerHTML = itemData.content;
+              return;
+            }
+          }
+
+          const mod = await import(`/src/renderers/${item.type}.js`);
           const blob = item.isBinary
             ? await (await fetch(text)).blob()
             : new Blob([text ?? ''], { type: 'text/plain' });

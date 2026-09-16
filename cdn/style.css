@@ -94,6 +94,18 @@ body[data-authed="true"] .auth-overlay {
   min-height: 0;
 }
 
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    overflow-y: auto;
+  }
+  .preview-pane {
+    padding: 10px;
+    justify-content: flex-start;
+  }
+}
+
 .pane {
   display: flex; flex-direction: column;
   min-height: 0;
@@ -127,6 +139,12 @@ body[data-authed="true"] .auth-overlay {
   gap: 10px 12px;
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 500px) {
+  .editor-fields {
+    grid-template-columns: 1fr;
+  }
 }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .field-row { display: contents; }
@@ -168,11 +186,13 @@ body[data-authed="true"] .auth-overlay {
 .push-status.ok { color: var(--ok); }
 
 .preview-frame {
-  width: 800px;
-  height: 480px;
+  width: 100%;
+  max-width: calc(800px - 2px); /* Account for 1px border on each side */
+  aspect-ratio: 800 / 480;
   border: 1px solid var(--border);
   background: #fff;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* ---------- Buttons ---------- */

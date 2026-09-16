@@ -197,8 +197,13 @@ function resetForm() {
   el.idInput.disabled = false;
   el.typeSelect.value = supportedTypes[0] ?? '';
   el.sourceInput.value = DEFAULT_SOURCE_BY_TYPE[el.typeSelect.value] ?? 'content.txt';
-  el.startInput.value = '';
+  
+  // Pre-popola 'start' con ora corrente
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  el.startInput.value = now.toISOString().slice(0, 16);
   el.endInput.value = '';
+  
   el.priorityInput.value = '0';
   el.enabledInput.checked = true;
   el.titleInput.value = '';
@@ -234,8 +239,18 @@ async function loadContent(id) {
   el.idInput.disabled = true; // rinominare = creare+eliminare, non un update
   el.typeSelect.value = meta.type ?? supportedTypes[0] ?? '';
   el.sourceInput.value = meta.source ?? '';
-  el.startInput.value = meta.start ?? '';
-  el.endInput.value = meta.end ?? '';
+  
+  // Conversione ISO per datetime-local
+  const formatForInput = (iso) => {
+    if (!iso) return '';
+    const date = new Date(iso);
+    if (isNaN(date.getTime())) return '';
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 16);
+  };
+  
+  el.startInput.value = formatForInput(meta.start);
+  el.endInput.value = formatForInput(meta.end);
   el.priorityInput.value = String(meta.priority ?? 0);
   el.enabledInput.checked = meta.enabled !== false;
   el.titleInput.value = meta.title ?? '';
@@ -342,8 +357,10 @@ function buildMeta() {
   }
 
   const meta = { id, type, source };
-  if (el.startInput.value.trim()) meta.start = el.startInput.value.trim();
-  if (el.endInput.value.trim()) meta.end = el.endInput.value.trim();
+  // Prendi il valore dell'input datetime-local e convertilo in ISO
+  if (el.startInput.value) meta.start = new Date(el.startInput.value).toISOString();
+  if (el.endInput.value) meta.end = new Date(el.endInput.value).toISOString();
+  
   meta.priority = Number(el.priorityInput.value) || 0;
   meta.enabled = el.enabledInput.checked;
   if (el.titleInput.value.trim()) meta.title = el.titleInput.value.trim();

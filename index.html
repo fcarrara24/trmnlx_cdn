@@ -3,12 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=800, initial-scale=1" />
+    <meta http-equiv="refresh" content="0; url=./cdn/" />
     <title>TRMNL Generic Display</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main id="content" class="content" aria-live="polite">
-      <p class="viewer-boot">Caricamento…</p>
+      <p class="viewer-boot">Reindirizzamento all'editor... <a href="./cdn/">Clicca qui se non vieni reindirizzato.</a></p>
+      <p><a href="?viewer=1">Vai al visualizzatore (viewer)</a></p>
     </main>
 
     <!-- Barra di stato: nascosta di default, visibile con ?debug=1 -->
@@ -17,6 +19,10 @@
     <script type="module">
       if (new URLSearchParams(location.search).has('debug')) {
         document.querySelector('#status').hidden = false;
+      }
+      if (new URLSearchParams(location.search).has('viewer')) {
+        document.querySelector('meta[http-equiv="refresh"]').remove();
+        document.querySelector('.viewer-boot').hidden = true;
       }
     </script>
     <script type="module" src="./src/viewer.js"></script>
