@@ -29,8 +29,9 @@ export function isActive(item, now) {
 /**
  * Seleziona il contenuto da visualizzare.
  *
- * Ordina gli item attivi per start DESC, poi priority DESC, e ritorna il primo.
- * In assenza di item attivi ritorna il contenuto `default`, se presente.
+ * Ordina gli item attivi per priority DESC, poi per start DESC (per i tie-break),
+ * e ritorna il primo. In assenza di item attivi ritorna il contenuto
+ * `default`, se presente.
  *
  * @param {{items?: object[]}} schedule schedule.json deserializzato
  * @param {Date} [now] istante di valutazione
@@ -42,8 +43,8 @@ export function selectContent(schedule, now = new Date()) {
   const active = items
     .filter((item) => isActive(item, now))
     .sort((a, b) => (
-      new Date(b.start ?? ALWAYS_ACTIVE) - new Date(a.start ?? ALWAYS_ACTIVE)
-      || (b.priority ?? 0) - (a.priority ?? 0)
+      (b.priority ?? 0) - (a.priority ?? 0)
+      || new Date(b.start ?? ALWAYS_ACTIVE) - new Date(a.start ?? ALWAYS_ACTIVE)
     ));
 
   if (active.length > 0) return active[0];

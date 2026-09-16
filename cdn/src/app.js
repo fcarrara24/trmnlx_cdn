@@ -256,6 +256,7 @@ async function loadContent(id) {
   el.titleInput.value = meta.title ?? '';
   el.optionsTextarea.value = meta.options ? JSON.stringify(meta.options, null, 2) : '';
   el.deleteBtn.disabled = false;
+  el.pushBtn.disabled = false;
 
   updateContentFieldVisibility();
 
@@ -436,7 +437,6 @@ async function handlePush() {
 
 async function handleDelete() {
   if (!selectedId) return;
-  if (!confirm(`Eliminare "${selectedId}"? L'azione fa un commit di rimozione, non è reversibile da qui.`)) return;
 
   const token = getToken();
   const basePath = `${config.contentPath}/${selectedId}`;
