@@ -5,7 +5,7 @@
  * nessun grigio tenue: solo nero su bianco con contrasto pieno.
  */
 
-:root {
+:root { 
   --ink: #000;
   --paper: #fff;
   --screen-width: 800px;
