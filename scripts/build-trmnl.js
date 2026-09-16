@@ -50,6 +50,8 @@ async function renderMermaid(sourcePath, outputPath) {
     'neutral',
     '-b',
     'white',
+    '--width',
+    '800',
     '--puppeteerConfigFile',
     puppeteerConfig,
   ]);

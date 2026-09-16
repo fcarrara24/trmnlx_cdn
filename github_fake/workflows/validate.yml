@@ -1,0 +1,33 @@
+name: Validate content
+
+on:
+  pull_request:
+    paths:
+      - 'content/**'
+      - 'src/**'
+      - 'scripts/**'
+      - 'test/**'
+      - 'cdn/**'
+      - 'package.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installa le dipendenze
+        run: npm ci
+
+      - name: Valida i contenuti e genera schedule.json + trmnl.json
+        run: npm run build
+
+      - name: Esegui i test
+        run: npm test

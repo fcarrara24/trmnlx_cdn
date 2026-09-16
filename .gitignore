@@ -1,2 +1,4 @@
 public/*
 node_modules/*
+.env
+clean-2

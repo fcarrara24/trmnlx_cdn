@@ -10,7 +10,7 @@
 
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { stat, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -35,10 +35,29 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
 };
 
+/** Recupera SESSION_KEY da .env o dalle variabili d'ambiente. */
+async function getSessionKey() {
+  if (process.env.SESSION_KEY) {
+    return process.env.SESSION_KEY;
+  }
+  try {
+    const envPath = path.resolve(ROOT, '.env');
+    const content = await readFile(envPath, 'utf8');
+    const match = content.match(/^\s*SESSION_KEY\s*=\s*(.*)\s*$/m);
+    if (match) {
+      return match[1].trim().replace(/^['"]|['"]$/g, '');
+    }
+  } catch {
+    // .env non presente o non leggibile
+  }
+  return null;
+}
+
 /** Traduce un URL in un percorso su disco, rifiutando le path traversal. */
 function resolveRequest(urlPath) {
   const decoded = decodeURIComponent(urlPath.split('?')[0]);
-  const relative = decoded === '/' ? 'index.html' : decoded.replace(/^\/+/, '');
+  const withIndex = decoded.endsWith('/') ? `${decoded}index.html` : decoded;
+  const relative = withIndex === '/index.html' ? 'index.html' : withIndex.replace(/^\/+/, '');
   // schedule.json vive in public/ ma è servito dalla root, come su Pages.
   const mapped = relative === 'schedule.json' ? 'public/schedule.json' : relative;
   const resolved = path.resolve(ROOT, mapped);
@@ -46,6 +65,18 @@ function resolveRequest(urlPath) {
 }
 
 const server = createServer(async (request, response) => {
+  if (request.url === '/api/dev-token') {
+    const token = await getSessionKey();
+    if (token) {
+      response.writeHead(200, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ token }));
+    } else {
+      response.writeHead(404, { 'content-type': 'application/json' });
+      response.end(JSON.stringify({ error: 'SESSION_KEY non trovato' }));
+    }
+    return;
+  }
+
   const filePath = resolveRequest(request.url);
 
   if (!filePath) {
