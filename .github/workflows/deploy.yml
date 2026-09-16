@@ -58,6 +58,7 @@ jobs:
           cp public/trmnl.json _site/
 
           cp -r src _site/
+          cp -r cdn _site/
           cp -r content _site/
 
       - name: Setup Pages
