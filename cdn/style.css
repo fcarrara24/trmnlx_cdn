@@ -95,10 +95,15 @@ body[data-authed="true"] .auth-overlay {
 }
 
 @media (max-width: 900px) {
+  .app {
+    height: auto;
+    min-height: 100vh;
+  }
   .layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    flex: none;
   }
   .preview-pane {
     padding: 10px;
